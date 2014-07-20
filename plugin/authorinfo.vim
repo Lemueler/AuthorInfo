@@ -160,12 +160,13 @@ function s:AddTitle()
 
     exe 'normal '.gotoLn.'G'
     startinsert!
-    echohl WarningMsg | echo "Succ to add the copyright." | echohl None
+    echohl WarningMsg | echo "Add the copyright successfully!" | echohl None
 endf
 function s:TitleDet()
     silent! normal ms
     let updated = 0
     let n = 1
+    let msg = "Update"
     "默认为添加
     while n < 20
         let line = getline(n)
@@ -183,9 +184,12 @@ function s:TitleDet()
     endwhile
     if updated == 1
         silent! normal 's
-        echohl WarningMsg | echo "Succ to update the copyright." | echohl None
+        echohl WarningMsg | echo "Update the copyright successfully!" | echohl None
         return
     endif
-    call s:AddTitle()
+    if getline(1) == ""
+        call s:AddTitle()
+    endif
 endfunction
 command! -nargs=0 AuthorInfoDetect :call s:TitleDet()
+command! -nargs=0 AuthorInfoAdd :call s:AddTitle()
