@@ -4,8 +4,9 @@
 "  Email:           zny2008@gmail.com
 "  FileName:        authorinfo.vim
 "  Description:
-"  Version:         1.5
-"  LastChange:      2011-02-23 16:42:42
+"  Version:         1.5-fixed
+"  Modified:        Steve Lemuel <wlemuel@hotmail.com>
+"  LastChange:      2015-08-01 19:16:21
 "  History:         support bash's #!xxx
 "                   fix bug for NerdComment's <leader>
 "=============================================================================
@@ -30,6 +31,7 @@ function! g:CheckFileType(type)
         return 0
     endif
 endfunction
+
 function s:superbeforeline()
     if &filetype == "sh"
         call append(0,"#!/usr/bin/env bash")
@@ -77,6 +79,7 @@ function s:DetectFirstLine()
     endwhile
     normal O
 endfunction
+
 function s:BeforeTitle()
     let arrData = [['python',"'''"]]
     for [t,v] in arrData
@@ -87,6 +90,7 @@ function s:BeforeTitle()
         endif
     endfor
 endfunction
+
 function s:AfterTitle()
     let arrData = [['python',"'''"]]
     for [t,v] in arrData
@@ -98,70 +102,90 @@ function s:AfterTitle()
         endif
     endfor
 endfunction
+
 function s:AddTitle()
+    if has('g:authorInfo_styleOne')
+        let s:mul_data = g:authorInfo_styleOne
+    else
+        let s:mul_data = ['c','cpp','java']
+    endif
+
+    if has('g:authorInfo_styleTwo')
+        let s:mul_data = g:authorInfo_styleOne
+    else
+        let s:sin_data = ['python','sh','ruby']
+    endif
+
+    if index(s:mul_data,&ft)<0 && index(s:sin_data,&ft)<0
+        finish
+    endif
+
     call s:superbeforeline()
     "检查开始插入作者信息的行
     call s:DetectFirstLine()
     "判断是否支持多行注释
-    let hasMul = 0
-    let preChar = ''
-    let noTypeChar = ''
 
-    call setline('.','test mul')
-    let oldline = getline('.')
-    exec 'normal '.s:t_mapleader.'cm'
-    let newline = getline('.')
-    if oldline != newline
+    if index(s:mul_data,&ft)>=0
         let hasMul = 1
-        let preChar = '#'
+        let preChar = ' *'
+        let noTypeChar = ''
+        let mulSymbolS = '/*'
+        let mulSymbolE = '*/'
     else
-        exec 'normal '.s:t_mapleader.'cl'
-        let newline = getline('.')
-        if oldline == newline
-            let hasMul = -1
-            let noTypeChar = '#'
-        endif
+        let hasMul = 2
+        let preChar = ''
+        let noTypeChar = '#'
+        let mulSymbolS = ''
+        let mulSymbolE = ''
     endif
 
     "在第一行之前做的事情
     call s:BeforeTitle()
 
     let firstLine = line('.')
-    call setline('.',noTypeChar.'=============================================================================')
+    call setline('.',noTypeChar.mulSymbolS.'=============================================================================')
     normal o
     call setline('.',noTypeChar.preChar.'     FileName: '.expand("%:t"))
     normal o
     call setline('.',noTypeChar.preChar.'         Desc: ')
     let gotoLn = line('.')
     normal o
-    call setline('.',noTypeChar.preChar.'       Author: '.g:vimrc_author)
-    normal o
-    call setline('.',noTypeChar.preChar.'        Email: '.g:vimrc_email)
-    normal o
-    "call setline('.',noTypeChar.preChar.'     HomePage: '.g:vimrc_homepage)
-    "normal o
+    if exists('g:authorInfo_author')
+        call setline('.',noTypeChar.preChar.'       Author: '.g:authorInfo_author)
+        normal o
+    endif
+    if exists('g:authorInfo_email')
+        call setline('.',noTypeChar.preChar.'        Email: '.g:authorInfo_email)
+        normal o
+    endif
+    if exists('g:authorInfo_homepage')
+        call setline('.',noTypeChar.preChar.'     HomePage: '.g:authorInfo_homepage)
+        normal o
+    endif
     call setline('.',noTypeChar.preChar.'      Version: 0.0.1')
     normal o
     call setline('.',noTypeChar.preChar.'   LastChange: '.strftime("%Y-%m-%d %H:%M:%S"))
     normal o
     call setline('.',noTypeChar.preChar.'    CreatedAt: '.strftime("%Y-%m-%d %H:%M:%S"))
     normal o
-    call setline('.',noTypeChar.'=============================================================================')
+    call setline('.',noTypeChar.preChar.'============================================================================='.mulSymbolE)
     let lastLine = line('.')
 
     "在最后一行之后做的事情
     call s:AfterTitle()
 
-    if hasMul == 1
-        exe 'normal '.firstLine.'Gv'.lastLine.'G'.s:t_mapleader.'cm'
-    else
-        exe 'normal '.firstLine.'Gv'.lastLine.'G'.s:t_mapleader.'cl'
-    endif
+    "let hasMulExec = 'normal '.firstLine.'Gv'.lastLine.'G'.s:t_mapleader.'c'
+    "if hasMul == 1
+        "exe hasMulExec.'m'
+    "else
+        "exe hasMulExec.'l'
+    "endif
 
     exe 'normal '.gotoLn.'G'
     startinsert!
     echohl WarningMsg | echo "Add the copyright successfully!" | echohl None
 endf
+
 function s:TitleDet()
     silent! normal ms
     let updated = 0
@@ -182,14 +206,17 @@ function s:TitleDet()
         endif
         let n = n + 1
     endwhile
+
     if updated == 1
         silent! normal 's
         echohl WarningMsg | echo "Update the copyright successfully!" | echohl None
         return
     endif
+
     if getline(1) == ""
         call s:AddTitle()
     endif
 endfunction
+
 command! -nargs=0 AuthorInfoDetect :call s:TitleDet()
 command! -nargs=0 AuthorInfoAdd :call s:AddTitle()
