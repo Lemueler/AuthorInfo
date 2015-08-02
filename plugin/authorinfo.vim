@@ -120,6 +120,12 @@ function s:AddTitle()
         finish
     endif
 
+    if exists('g:authorInfo_timeformat')
+        let s:timeformat = g:authorInfo_timeformat
+    else
+        let s:timeformat = '%Y-%m-%d %H:%M:%S'
+    endif
+
     call s:superbeforeline()
     "检查开始插入作者信息的行
     call s:DetectFirstLine()
@@ -127,7 +133,7 @@ function s:AddTitle()
 
     if index(s:mul_data,&ft)>=0
         let hasMul = 1
-        let preChar = ' *'
+        let preChar = '*'
         let noTypeChar = ''
         let mulSymbolS = '/*'
         let mulSymbolE = '*/'
@@ -170,9 +176,9 @@ function s:AddTitle()
     endif
     call setline('.',noTypeChar.preChar.'      Version: 0.0.1')
     normal o
-    call setline('.',noTypeChar.preChar.'   LastChange: '.strftime("%Y-%m-%d %H:%M:%S"))
+    call setline('.',noTypeChar.preChar.'   LastChange: '.strftime(s:timeformat))
     normal o
-    call setline('.',noTypeChar.preChar.'    CreatedAt: '.strftime("%Y-%m-%d %H:%M:%S"))
+    call setline('.',noTypeChar.preChar.'    CreatedAt: '.strftime(s:timeformat))
     normal o
     call setline('.',noTypeChar.preChar.'============================================================================='.mulSymbolE)
     let lastLine = line('.')
