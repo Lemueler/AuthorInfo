@@ -150,6 +150,12 @@ function s:AddTitle()
     call setline('.',noTypeChar.preChar.'         Desc: ')
     let gotoLn = line('.')
     normal o
+    if exists('g:authorInfo_license')
+        call setline('.',noTypeChar.preChar.'      License: '.g:authorInfo_license)
+    else
+        call setline('.',noTypeChar.preChar.'      License: GPL')
+    endif
+    normal o
     if exists('g:authorInfo_author')
         call setline('.',noTypeChar.preChar.'       Author: '.g:authorInfo_author)
         normal o
@@ -201,6 +207,11 @@ function s:TitleDet()
         endif
         if line =~ '^.*LastChange:\S*.*$'
             let newline=substitute(line,':\(\s*\)\(\S.*$\)$',':\1'.strftime("%Y-%m-%d %H:%M:%S"),'g')
+            call setline(n,newline)
+            let updated = 1
+        endif
+        if line =~ '^.*Last\ modified:\S*.*$'
+            let newline=substitute(line,':\(\s*\)\(\S.*$\)$',':\1'.strftime("%Y-%m-%d %H:%M"),'g')
             call setline(n,newline)
             let updated = 1
         endif
