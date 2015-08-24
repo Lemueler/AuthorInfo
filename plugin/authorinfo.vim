@@ -81,7 +81,7 @@ function s:DetectFirstLine()
 endfunction
 
 function s:BeforeTitle()
-    let arrData = [['python',"'''"]]
+    let arrData = [['python','"""']]
     for [t,v] in arrData
         if g:CheckFileType(t)
             call setline('.',v)
@@ -92,7 +92,7 @@ function s:BeforeTitle()
 endfunction
 
 function s:AfterTitle()
-    let arrData = [['python',"'''"]]
+    let arrData = [['python','"""']]
     for [t,v] in arrData
         if g:CheckFileType(t)
             normal o
