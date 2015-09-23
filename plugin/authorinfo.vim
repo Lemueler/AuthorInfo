@@ -113,7 +113,7 @@ function s:AddTitle()
     if has('g:authorInfo_styleTwo')
         let s:mul_data = g:authorInfo_styleOne
     else
-        let s:sin_data = ['python','sh','ruby']
+        let s:sin_data = ['python','sh','ruby','asm']
     endif
 
     if index(s:mul_data,&ft)<0 && index(s:sin_data,&ft)<0
