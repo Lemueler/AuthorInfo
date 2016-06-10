@@ -198,7 +198,7 @@ function s:AddTitle()
     echohl WarningMsg | echo "Add the copyright successfully!" | echohl None
 endf
 
-function s:TitleDet()
+function s:TitleDet(isAdd)
     silent! normal ms
     let updated = 0
     let n = 1
@@ -230,10 +230,11 @@ function s:TitleDet()
         return
     endif
 
-    if getline(1) == ""
+    if getline(1) == "" && a:isAdd == 1
         call s:AddTitle()
     endif
 endfunction
 
-command! -nargs=0 AuthorInfoDetect :call s:TitleDet()
+command! -nargs=0 AuthorInfoDetect :call s:TitleDet(1)
 command! -nargs=0 AuthorInfoAdd :call s:AddTitle()
+command! -nargs=0 AuthorInfoAutoUpdate :call s:TitleDet(0)
