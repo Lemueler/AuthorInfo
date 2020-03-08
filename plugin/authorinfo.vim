@@ -6,7 +6,7 @@
 "  Description:
 "  Version:         1.5-fixed
 "  Modified:        Steve Lemuel <wlemuel@hotmail.com>
-"  LastChange:      2015-08-01 19:16:21
+"  LastChange:      2020-03-08 19:26:50
 "  History:         support bash's #!xxx
 "                   fix bug for NerdComment's <leader>
 "=============================================================================
@@ -38,7 +38,7 @@ function s:superbeforeline()
         call append(1,"")
     endif
     if &filetype == "python"
-        call append(0,"#!/usr/bin/env python")
+        call append(0,"#!/usr/bin/env python3")
         call append(1,"# -*- coding: utf-8 -*-")
         call append(2,"")
     endif
